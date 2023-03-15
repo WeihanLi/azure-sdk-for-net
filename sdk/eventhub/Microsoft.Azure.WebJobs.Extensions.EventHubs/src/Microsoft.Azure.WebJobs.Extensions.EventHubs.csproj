@@ -44,4 +44,8 @@
     </EmbeddedResource>
   </ItemGroup>
 
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Azure.WebJobs" VersionOverride="3.0.37-11103" />
+	</ItemGroup>
+	
 </Project>
