@@ -110,7 +110,6 @@ namespace Microsoft.Azure.WebJobs.Extensions.ServiceBus.Tests
                 {
                     { $"{EventHubConnection1}", EventHubsTestEnvironment.Instance.EventHubsConnectionString },
                     { $"{EventHubConnection2}:fullyQualifiedNamespace", $"{EventHubsTestEnvironment.Instance.EventHubsNamespace}.servicebus.windows.net" },
-                    { "HostingConfig:Microsoft.Azure.WebJobs.Extensions.EventHubs", "1" },
                     { "AzureWebJobsStorage", StorageTestEnvironment.Instance.StorageConnectionString }
                 };
 
