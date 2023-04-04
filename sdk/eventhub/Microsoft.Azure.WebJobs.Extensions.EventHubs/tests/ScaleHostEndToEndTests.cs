@@ -8,14 +8,12 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Azure.Core;
 using Azure.Messaging.EventHubs;
 using Azure.Messaging.EventHubs.Primitives;
 using Azure.Messaging.EventHubs.Producer;
 using Azure.Messaging.EventHubs.Tests;
 using Azure.Storage.Blobs;
 using Microsoft.Azure.WebJobs.EventHubs;
-using Microsoft.Azure.WebJobs.Host.EndToEndTests;
 using Microsoft.Azure.WebJobs.Host.Scale;
 using Microsoft.Azure.WebJobs.Host.TestCommon;
 using Microsoft.Extensions.Azure;
@@ -121,10 +119,8 @@ namespace Microsoft.Azure.WebJobs.Extensions.ServiceBus.Tests
             })
             .ConfigureServices(services =>
             {
-                services.AddAzureClientsCore();
                 services.AddAzureStorageScaleServices();
 
-                services.AddSingleton<IScaleMetricsRepository, TestScaleMetricsRepository>();
                 FakeNameResolver nameResolver = new FakeNameResolver();
                 nameResolver.Add(EventHubConnection1, EventHubsTestEnvironment.Instance.EventHubsConnectionString);
                 nameResolver.Add(EventHubConnection2, $"{EventHubsTestEnvironment.Instance.EventHubsNamespace}.servicebus.windows.net");
@@ -151,6 +147,7 @@ namespace Microsoft.Azure.WebJobs.Extensions.ServiceBus.Tests
                 scaleOptions.MetricsPurgeEnabled = false;
                 scaleOptions.ScaleMetricsMaxAge = TimeSpan.FromMinutes(4);
                 scaleOptions.IsRuntimeScalingEnabled = true;
+                scaleOptions.ScaleMetricsSampleInterval = TimeSpan.FromSeconds(1);
             });
 
             IHost scaleHost = hostBuilder.Build();
@@ -169,9 +166,9 @@ namespace Microsoft.Azure.WebJobs.Extensions.ServiceBus.Tests
 
             await TestHelpers.Await(async () =>
             {
-                ScaleManager scaleManager = scaleHost.Services.GetService<ScaleManager>();
+                IScaleStatusProvider scaleStatusProvider = scaleHost.Services.GetService<IScaleStatusProvider>();
 
-                var scaleStatus = await scaleManager.GetScaleStatusAsync(new ScaleStatusContext());
+                var scaleStatus = await scaleStatusProvider.GetScaleStatusAsync(new ScaleStatusContext());
 
                 bool scaledOut = false;
                 if (!tbsEnabled)
@@ -211,75 +208,6 @@ namespace Microsoft.Azure.WebJobs.Extensions.ServiceBus.Tests
 
                 return scaledOut;
             });
-        }
-
-        internal class TestScaleMetricsRepository : IScaleMetricsRepository
-        {
-            private Dictionary<IScaleMonitor, List<ScaleMetrics>> _cache;
-
-            public TestScaleMetricsRepository()
-            {
-                _cache = new Dictionary<IScaleMonitor, List<ScaleMetrics>>();
-            }
-
-            public Task WriteMetricsAsync(IDictionary<IScaleMonitor, ScaleMetrics> monitorMetrics)
-            {
-                foreach (var kvp in monitorMetrics)
-                {
-                    if (_cache.TryGetValue(kvp.Key, out var value))
-                    {
-                        value.Add(kvp.Value);
-                    }
-                    else
-                    {
-                        _cache[kvp.Key] = new List<ScaleMetrics> { kvp.Value };
-                    }
-                }
-
-                return Task.CompletedTask;
-            }
-
-            public Task<IDictionary<IScaleMonitor, IList<ScaleMetrics>>> ReadMetricsAsync(IEnumerable<IScaleMonitor> monitors)
-            {
-                IDictionary<IScaleMonitor, IList<ScaleMetrics>> result = new Dictionary<IScaleMonitor, IList<ScaleMetrics>>();
-
-                foreach (var monitor in monitors)
-                {
-                    if (_cache.TryGetValue(monitor, out var value))
-                    {
-                        result.Add(monitor, value);
-                    }
-                    else
-                    {
-                        result.Add(monitor, new List<ScaleMetrics>());
-                    }
-                }
-
-                return Task.FromResult(result);
-            }
-        }
-
-        internal class AzureComponentFactoryWrapper : AzureComponentFactory
-        {
-            private readonly AzureComponentFactory _factory;
-            private readonly TokenCredential _tokenCredential;
-
-            public AzureComponentFactoryWrapper(AzureComponentFactory factory, TokenCredential tokenCredential)
-            {
-                _factory = factory;
-                _tokenCredential = tokenCredential;
-            }
-
-            public override TokenCredential CreateTokenCredential(IConfiguration configuration)
-            {
-                return _tokenCredential != null ? _tokenCredential : _factory.CreateTokenCredential(configuration);
-            }
-
-            public override object CreateClientOptions(Type optionsType, object serviceVersion, IConfiguration configuration)
-                => _factory.CreateClientOptions(optionsType, serviceVersion, configuration);
-
-            public override object CreateClient(Type clientType, IConfiguration configuration, TokenCredential credential, object clientOptions)
-                => _factory.CreateClient(clientType, configuration, credential, clientOptions);
         }
     }
 }
