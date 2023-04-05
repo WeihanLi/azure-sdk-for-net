@@ -5,6 +5,7 @@ using System;
 using Azure.Messaging.EventHubs.Primitives;
 using Microsoft.Azure.WebJobs.EventHubs.Processor;
 using Microsoft.Azure.WebJobs.Extensions.EventHubs.Listeners;
+using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Azure.WebJobs.Host.Scale;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
@@ -15,12 +16,12 @@ using Newtonsoft.Json;
 
 namespace Microsoft.Azure.WebJobs.EventHubs.Listeners
 {
-    internal class EventHubsScaleProvider : IScaleMonitorProvider, ITargetScalerProvider
+    internal class EventHubsScalerProvider : IScaleMonitorProvider, ITargetScalerProvider
     {
         private readonly IScaleMonitor _scaleMonitor;
         private readonly ITargetScaler _targetScaler;
 
-        public EventHubsScaleProvider(IServiceProvider serviceProvider, TriggerMetadata triggerMetadata)
+        public EventHubsScalerProvider(IServiceProvider serviceProvider, TriggerMetadata triggerMetadata)
         {
             AzureComponentFactory azureComponentFactory;
             if ((triggerMetadata.Properties != null) && (triggerMetadata.Properties.TryGetValue(nameof(AzureComponentFactory), out object value)))
@@ -41,6 +42,7 @@ namespace Microsoft.Azure.WebJobs.EventHubs.Listeners
             var nameResolver = serviceProvider.GetService<INameResolver>();
             var evetnHubMetadata = JsonConvert.DeserializeObject<EventHubMetadata>(triggerMetadata.Metadata.ToString());
             var factory = new EventHubClientFactory(configuration, hostComponentFactory, options, nameResolver, logForwarder, checkpointClientProvider);
+            evetnHubMetadata.ResolveProperties(serviceProvider.GetService<INameResolver>());
             var eventHubConsumerClient = factory.GetEventHubConsumerClient(evetnHubMetadata.EventHubName, evetnHubMetadata.Connection, evetnHubMetadata.ConsumerGroup);
             var checkpointStore = new BlobCheckpointStoreInternal(
                 factory.GetCheckpointStoreClient(),
@@ -87,6 +89,15 @@ namespace Microsoft.Azure.WebJobs.EventHubs.Listeners
 
             [JsonProperty]
             public string Connection { get; set; }
+
+            public void ResolveProperties(INameResolver resolver)
+            {
+                if (resolver != null)
+                {
+                    EventHubName = resolver.ResolveWholeString(EventHubName);
+                    ConsumerGroup = resolver.ResolveWholeString(ConsumerGroup);
+                }
+            }
         }
     }
 }

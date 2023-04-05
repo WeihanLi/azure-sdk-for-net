@@ -95,7 +95,7 @@ namespace Microsoft.Extensions.Hosting
         public static IWebJobsBuilder AddServiceBusScaleForTrigger(this IWebJobsBuilder builder, TriggerMetadata triggerMetadata)
         {
             IServiceProvider serviceProvider = null;
-            Lazy<EventHubsScaleProvider> scalerProvider = new Lazy<EventHubsScaleProvider>(() => new EventHubsScaleProvider(serviceProvider, triggerMetadata));
+            Lazy<EventHubsScalerProvider> scalerProvider = new Lazy<EventHubsScalerProvider>(() => new EventHubsScalerProvider(serviceProvider, triggerMetadata));
 
             builder.Services.AddSingleton<IScaleMonitorProvider>(resolvedServiceProvider =>
             {
