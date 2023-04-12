@@ -10,7 +10,7 @@ tag: package-2023-01-15-preview
 model-namespace: false
 
 require:
-     - https://github.com/williamzhao87/azure-rest-api-specs/blob/b971ee8f78a42423a06599fb5a5984abe93660dd/specification/communication/data-plane/CallAutomation/readme.md
+     - https://github.com/williamzhao87/azure-rest-api-specs/blob/81b7b063c0a25e9491a085620603327a3d8a9e68/specification/communication/data-plane/CallAutomation/readme.md
 title: Azure Communication Services
 
 generation1-convenience-client: true

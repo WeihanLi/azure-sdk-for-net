@@ -68,9 +68,6 @@ namespace Azure.Communication.CallAutomation.Tests.CallMedias
 
         private static readonly CallMediaRecognizeOptions _emptyRecognizeOptions = new CallMediaRecognizeDtmfOptions(new CommunicationUserIdentifier("targetUserId"), maxTonesToCollect: 1);
 
-        private static readonly SendDtmfOptions _sendDmtfOptions = new(new CommunicationUserIdentifier("targetUserId"),
-            new DtmfTone[] { DtmfTone.One, DtmfTone.Two, DtmfTone.Three, DtmfTone.Pound });
-
         private static CallMedia? _callMedia;
 
         [SetUp]
@@ -398,7 +395,8 @@ namespace Azure.Communication.CallAutomation.Tests.CallMedias
             {
                 new Func<CallMedia, Response<SendDtmfResult>>?[]
                 {
-                   callMedia => callMedia.SendDtmf(_sendDmtfOptions)
+                   callMedia => callMedia.SendDtmf(new CommunicationUserIdentifier("targetUserId"),
+            new DtmfTone[] { DtmfTone.One, DtmfTone.Two, DtmfTone.Three, DtmfTone.Pound })
                 }
             };
         }
@@ -409,7 +407,8 @@ namespace Azure.Communication.CallAutomation.Tests.CallMedias
             {
                 new Func<CallMedia, Task<Response<SendDtmfResult>>>?[]
                 {
-                   callMedia => callMedia.SendDtmfAsync(_sendDmtfOptions)
+                   callMedia => callMedia.SendDtmfAsync(new CommunicationUserIdentifier("targetUserId"),
+            new DtmfTone[] { DtmfTone.One, DtmfTone.Two, DtmfTone.Three, DtmfTone.Pound })
                 }
             };
         }

@@ -7,20 +7,20 @@
 
 namespace Azure.Communication.CallAutomation
 {
-    /// <summary> The ContinuousDtmfRecognitionToneFailed. </summary>
-    public partial class ContinuousDtmfRecognitionToneFailed
+    /// <summary> The ContinuousDtmfRecognitionStopped. </summary>
+    public partial class ContinuousDtmfRecognitionStopped
     {
-        /// <summary> Initializes a new instance of ContinuousDtmfRecognitionToneFailed. </summary>
-        internal ContinuousDtmfRecognitionToneFailed()
+        /// <summary> Initializes a new instance of ContinuousDtmfRecognitionStopped. </summary>
+        internal ContinuousDtmfRecognitionStopped()
         {
         }
 
-        /// <summary> Initializes a new instance of ContinuousDtmfRecognitionToneFailed. </summary>
+        /// <summary> Initializes a new instance of ContinuousDtmfRecognitionStopped. </summary>
         /// <param name="callConnectionId"> CallconnectionID. </param>
         /// <param name="serverCallId"> ServercallID. </param>
         /// <param name="correlationId"> CorrelationIDforeventtocallcorrelation.AlsocalledChainIdforskypechainID. </param>
         /// <param name="resultInformation"> ContainstheresultingSIPcode/sub-codeandmessagefromNGCservices. </param>
-        internal ContinuousDtmfRecognitionToneFailed(string callConnectionId, string serverCallId, string correlationId, ResultInformation resultInformation)
+        internal ContinuousDtmfRecognitionStopped(string callConnectionId, string serverCallId, string correlationId, ResultInformation resultInformation)
         {
             CallConnectionId = callConnectionId;
             ServerCallId = serverCallId;

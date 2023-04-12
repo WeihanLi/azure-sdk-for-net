@@ -10,9 +10,9 @@ using Azure.Core;
 
 namespace Azure.Communication.CallAutomation
 {
-    public partial class ContinuousDtmfRecognitionToneFailed
+    public partial class ContinuousDtmfRecognitionStopped
     {
-        internal static ContinuousDtmfRecognitionToneFailed DeserializeContinuousDtmfRecognitionToneFailed(JsonElement element)
+        internal static ContinuousDtmfRecognitionStopped DeserializeContinuousDtmfRecognitionStopped(JsonElement element)
         {
             if (element.ValueKind == JsonValueKind.Null)
             {
@@ -50,7 +50,7 @@ namespace Azure.Communication.CallAutomation
                     continue;
                 }
             }
-            return new ContinuousDtmfRecognitionToneFailed(callConnectionId.Value, serverCallId.Value, correlationId.Value, resultInformation.Value);
+            return new ContinuousDtmfRecognitionStopped(callConnectionId.Value, serverCallId.Value, correlationId.Value, resultInformation.Value);
         }
     }
 }
