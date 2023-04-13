@@ -395,8 +395,11 @@ namespace Azure.Communication.CallAutomation.Tests.CallMedias
             {
                 new Func<CallMedia, Response<SendDtmfResult>>?[]
                 {
-                   callMedia => callMedia.SendDtmf(new CommunicationUserIdentifier("targetUserId"),
-            new DtmfTone[] { DtmfTone.One, DtmfTone.Two, DtmfTone.Three, DtmfTone.Pound })
+                   callMedia => callMedia.SendDtmf(
+                       new CommunicationUserIdentifier("targetUserId"),
+                       new DtmfTone[] { DtmfTone.One, DtmfTone.Two, DtmfTone.Three, DtmfTone.Pound },
+                       "context"
+                       )
                 }
             };
         }
@@ -407,8 +410,11 @@ namespace Azure.Communication.CallAutomation.Tests.CallMedias
             {
                 new Func<CallMedia, Task<Response<SendDtmfResult>>>?[]
                 {
-                   callMedia => callMedia.SendDtmfAsync(new CommunicationUserIdentifier("targetUserId"),
-            new DtmfTone[] { DtmfTone.One, DtmfTone.Two, DtmfTone.Three, DtmfTone.Pound })
+                   callMedia => callMedia.SendDtmfAsync(
+                       new CommunicationUserIdentifier("targetUserId"),
+                       new DtmfTone[] { DtmfTone.One, DtmfTone.Two, DtmfTone.Three, DtmfTone.Pound },
+                       "context"
+                       )
                 }
             };
         }
