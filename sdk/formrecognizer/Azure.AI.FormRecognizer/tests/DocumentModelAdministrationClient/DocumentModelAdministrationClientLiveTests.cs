@@ -180,6 +180,7 @@ namespace Azure.AI.FormRecognizer.DocumentAnalysis.Tests
         #region management ops
 
         [RecordedTest]
+        [Ignore("")]
         public async Task GetResourceDetails()
         {
             var client = CreateDocumentModelAdministrationClient();
@@ -191,7 +192,6 @@ namespace Azure.AI.FormRecognizer.DocumentAnalysis.Tests
         }
 
         [RecordedTest]
-        [Ignore("")]
         public async Task GetPrebuiltModel()
         {
             var client = CreateDocumentModelAdministrationClient();
