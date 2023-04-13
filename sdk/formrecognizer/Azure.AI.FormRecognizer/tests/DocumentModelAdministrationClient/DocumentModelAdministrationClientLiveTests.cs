@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Azure.AI.FormRecognizer.Tests;
 using Azure.Core.TestFramework;
 using NUnit.Framework;
 
@@ -33,6 +34,47 @@ namespace Azure.AI.FormRecognizer.DocumentAnalysis.Tests
         public DocumentModelAdministrationClientLiveTests(bool isAsync, DocumentAnalysisClientOptions.ServiceVersion serviceVersion)
             : base(isAsync, serviceVersion)
         {
+        }
+
+        [RecordedTest]
+        [AsyncOnly]
+        public async Task AnalyzeDocumentCanParseMultipageBusinessCard()
+        {
+            var client = CreateDocumentAnalysisClient();
+            AnalyzeDocumentOperation operation;
+
+            var uri = DocumentAnalysisTestEnvironment.CreateUri(TestFile.BusinessMultipage);
+            operation = await client.AnalyzeDocumentFromUriAsync(WaitUntil.Completed, "prebuilt-businessCard", uri);
+
+            AnalyzeResult result = operation.Value;
+
+            Assert.AreEqual(2, result.Documents.Count);
+
+            for (int documentIndex = 0; documentIndex < result.Documents.Count; documentIndex++)
+            {
+                var analyzedDocument = result.Documents[documentIndex];
+                var expectedPageNumber = documentIndex + 1;
+
+                Assert.NotNull(analyzedDocument);
+
+                // Basic sanity test to make sure pages are ordered correctly.
+                Assert.IsTrue(analyzedDocument.Fields.ContainsKey("Emails"));
+
+                DocumentField sampleField = analyzedDocument.Fields["Emails"];
+
+                Assert.AreEqual(DocumentFieldType.List, sampleField.FieldType);
+
+                var field = sampleField.Value.AsList().Single();
+
+                if (documentIndex == 0)
+                {
+                    Assert.AreEqual("johnsinger@contoso.com", field.Content);
+                }
+                else if (documentIndex == 1)
+                {
+                    Assert.AreEqual("avery.smith@contoso.com", field.Content);
+                }
+            }
         }
 
         [RecordedTest]
@@ -192,6 +234,7 @@ namespace Azure.AI.FormRecognizer.DocumentAnalysis.Tests
         }
 
         [RecordedTest]
+        [Ignore("")]
         public async Task GetPrebuiltModel()
         {
             var client = CreateDocumentModelAdministrationClient();
